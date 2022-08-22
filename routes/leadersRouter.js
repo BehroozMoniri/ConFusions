@@ -1,52 +1,81 @@
 const express =require('express');
 const bodyParser =require('body-parser');
-const leadersRouter = express.Router();
+const mongoose = require('mongoose');
+const Leaders = require('../models/leaders');
+const cors = require('./cors');
+var authenticate = require('../authenticate');
+const leaderRouter = express.Router();
 
-leadersRouter.use(bodyParser.json());
-leadersRouter.route('/')
-.all( (req, res, next) =>{
+leaderRouter.use(bodyParser.json());
+leaderRouter.route('/').options(cors.corsWithOptions, (req, res) => {res.sendStatus(200);})
+.get(cors.cors, (req, res, next) => {
+    Leaders.find({})
+    .then((leaders)  => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leaders);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+.post(cors.corsWithOptions, authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
+    Leaders.create(req.body)
+  .then((leaders) => {
     res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    next();
+    console.log('Leaders created', leaders);
+    res.setHeader('Content-Type', 'application/json');
+    res.json(leaders);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 })
-.get((req, res, next) => {
-    res.end('You will see all the leaders here!');
-})
-.post( (req, res, next) => {
-    res.end('Will add a new leader: '+req.body.name + ' with details: ' +
-     req.body.description); 
-})
-.put( (req, res, next) => {
+.put( cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.end('Put operation is not supported on leaders '); 
 })
-.delete( (req, res, next) => {
-    res.end('Deleting all dishes!');
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,  (req, res, next) => {
+    Leaders.remove({})
+    .then((res) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(leaders);
+    }, (err) => next(err))
+    .catch((err) => next(err));
 });
 
-leadersRouter.route('/:leaderID')
-.all( (req, res, next) =>{
-    res.statusCode = 200;
+leaderRouter.route('/:leaderID').options(cors.corsWithOptions, (req, res) => {res.sendStatus(200);})
+.get(cors.cors,  (req, res, next) => {
+    Leaders.findById(req.params.leaderID)
+    .then((leader) => {
+     res.statusCode = 200;
+     res.setHeader('Content-Type', 'application/json');
+     res.json(leader);
+     }, (err) => next(err))
+     .catch((err) => next(err));
+ })
+ .post(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
+    res.statusCode = 403;
     res.setHeader('Content-Type', 'text/plain');
-    next();
+    res.end('POST operation not supported on /leaders/'+ req.params.leaderID);
 })
-.get( (req, res, next) => {
-    res.end('You will view details of leader: ' +
-    req.params.leaderID + ' here!');
-})
-.post(  (req, res, next) => {
-    res.statusCode = 403;
-    res.end('Post operation is not supported on leader: '+ 
-    req.params.leaderID); 
-})
-.put( (req, res, next) => {
-    res.statusCode = 403;
-    res.write('Updating the leader...' + req.params.leaderID + ' is not allowed!\n');
-    // res.end('Will update the dish: ' + req.body.name + 'with details: '+
-    // req.body.description); 
-})
-.delete(  (req, res, next) => {
-    res.end('Deleting the dish: ' + req.params.leaderID);
-});
+ .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
+     Leaders.findByIdAndUpdate(req.params.leaderID, {
+         $set: req.body
+     }, { new: true})
+     .then((leader) => {
+         res.statusCode = 200;
+         res.setHeader('Content-Type', 'application/json');
+         res.json(leader);
+         }, (err) => next(err))
+         .catch((err) => next(err));
+ })
+ .delete(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+     Leaders.findByIdAndRemove(req.params.leaderID)
+     .then((res) => {
+         res.statusCode = 200;
+         res.setHeader('Content-Type', 'application/json');
+         res.json(leader);
+     }, (err) => next(err))
+     .catch((err) => next(err));
+ });
 
-module.exports = leadersRouter;
+
+module.exports = leaderRouter;
