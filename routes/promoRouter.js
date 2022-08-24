@@ -60,7 +60,7 @@ promoRouter.route('/:promoID')
      res.end('Post operation is not supported on a promo/'+ 
      req.params.promoID); 
  })
- .put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin,  (req, res, next) => {
+ .put(cors.corsWithOptions, authenticate.verifyUser,    (req, res, next) => {
     Promotions.findByIdAndUpdate(req.params.promoID, {
          $set: req.body
      }, { new: true})

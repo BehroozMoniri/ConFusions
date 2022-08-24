@@ -10,6 +10,12 @@ var User = new Schema({
     lastname: {
         type: String,
         default: ''
+    }, 
+    favorites: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref : 'dish',
+        required:false,
+       
     },
     facebookId:  String,
     admin:   {
@@ -17,5 +23,8 @@ var User = new Schema({
         default: false
     }
 });
+module.exports = User
+
 User.plugin(passportLocalMongoose);
 module.exports = mongoose.model('User', User);
+

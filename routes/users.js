@@ -82,6 +82,7 @@ router.get('/logout', cors.corsWithOptions, (req, res, next) => {
     res.redirect('/');
   }
 });
+
 router.get('/facebook/token', passport.authenticate
 ('facebook-token'), (req, res) => {
   if (req.user) {

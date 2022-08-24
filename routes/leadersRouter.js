@@ -17,7 +17,7 @@ leaderRouter.route('/').options(cors.corsWithOptions, (req, res) => {res.sendSta
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(cors.corsWithOptions, authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Leaders.create(req.body)
   .then((leaders) => {
     res.statusCode = 200;
@@ -27,11 +27,11 @@ leaderRouter.route('/').options(cors.corsWithOptions, (req, res) => {res.sendSta
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.put( cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
+.put( cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('Put operation is not supported on leaders '); 
 })
-.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,  (req, res, next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser,  (req, res, next) => {
     Leaders.remove({})
     .then((res) => {
         res.statusCode = 200;
@@ -51,12 +51,12 @@ leaderRouter.route('/:leaderID').options(cors.corsWithOptions, (req, res) => {re
      }, (err) => next(err))
      .catch((err) => next(err));
  })
- .post(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
+ .post(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403;
     res.setHeader('Content-Type', 'text/plain');
-    res.end('POST operation not supported on /leaders/'+ req.params.leaderID);
+    res.end('POST operation not supported on /leaders/'+ res.params.leaderID);
 })
- .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
+ .put(cors.corsWithOptions,   (req, res, next) => {
      Leaders.findByIdAndUpdate(req.params.leaderID, {
          $set: req.body
      }, { new: true})
@@ -67,7 +67,7 @@ leaderRouter.route('/:leaderID').options(cors.corsWithOptions, (req, res) => {re
          }, (err) => next(err))
          .catch((err) => next(err));
  })
- .delete(cors.corsWithOptions,authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+ .delete(cors.corsWithOptions,  (req, res, next) => {
      Leaders.findByIdAndRemove(req.params.leaderID)
      .then((res) => {
          res.statusCode = 200;

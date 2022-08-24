@@ -1,10 +1,5 @@
-
 const mongoose = require('mongoose');
-
-const { Schema , model } = require('mongoose') // mongoose.Schema;
-// require('mongoose-currency').loadType(mongoose);
-// const Currency = mongoose.Types.Currency;
-
+const Schema = mongoose.Schema;
 
 var commentSchema = new Schema({
     rating:  {
@@ -60,6 +55,21 @@ var dishSchema = new Schema({
 }, {
     timestamps: true
 });
-var Dishes = mongoose.model('Dish', dishSchema);
-module.exports = Dishes;
- 
+
+
+const favSchema = new Schema ({
+    user : {    
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, "Favourite must have a user!" ]
+    },
+    dish : [ {    
+        type: Schema.Types.ObjectId,
+        ref: 'Dish'
+    }]
+}
+, {timestamps: true
+});
+
+var Favourites = mongoose.model('favourite', favSchema);
+module.exports = Favourites;
