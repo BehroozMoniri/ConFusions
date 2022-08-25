@@ -10,10 +10,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
  
- 
-
- 
-
 exports.getToken = function(user) {
     return jwt.sign(user, config.secretKey,
         {expiresIn: 14400});
@@ -31,6 +27,7 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
                 return done(err, false);
             }
             else if (user) {
+                console.log(user);
                 return done(null, user);
             }
             else {

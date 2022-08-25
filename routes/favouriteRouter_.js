@@ -1,19 +1,18 @@
-const express =require('express');
-const bodyParser =require('body-parser');
+const express = require('express');
 const mongoose = require('mongoose');
-const Favourites = require('../models/favourite');
-const Dishes = require('../models/dishes');
-const User = require('../models/user');
+const authenticate = require('../authenticate');
+const cors = require('./cors');
+
+const Favorites = require('../models/favourite');
 
 const favRouter = express.Router();
-const cors = require('./cors');
-favRouter.use(bodyParser.json());
-var authenticate = require('../authenticate');
+
+favRouter.use(express.json());
 
 favRouter.route('/')
-.options(cors.corsWithOptions, (req, res) => {res.sendStatus(200);})
+.options(cors.corsWithOptions, (req, res) => {  res.sendStatus(200); })
 .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favourites.findOne({user: req.user._id})
+    Favorites.findOne({user: req.user._id})
     .populate('user').populate('dishes')
     .then( (fav) => {
         res.statusCode = 200;
@@ -23,7 +22,7 @@ favRouter.route('/')
     .catch( (err) => next(err));
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favourites.findOne({user: req.user._id}, (err, fav) => {
+    Favorites.findOne({user: req.user._id}, (err, fav) => {
         if(err) {
             next(err);
         }
@@ -60,11 +59,12 @@ favRouter.route('/')
     });
 })
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+
     res.statusCode = 403;
-    res.end('PUT operation is not supported on /favorites'); 
+    res.end('PUT operation not supported on /favorites'); 
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favourites.findOneAndDelete({user: req.user._id}, (err, resp) => {
+    Favorites.findOneAndDelete({user: req.user._id}, (err, resp) => {
         if(err) {
             next(err);
         }
@@ -80,10 +80,10 @@ favRouter.route('/:dishId')
 .options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); })
 .get(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
-    res.end('GET operation is not supported on /favorites/' + req.params.dishId); 
+    res.end('GET operation not supported on /favorites/' + req.params.dishId); 
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favourites.findOne({user: req.user._id}, (err, fav) => {
+    Favorites.findOne({user: req.user._id}, (err, fav) => {
         if(err) {
             next(err);
         }
@@ -105,7 +105,7 @@ favRouter.route('/:dishId')
             }
         }
         else {
-            Favourites.create({
+            Favorites.create({
                 user: req.user._id,
                 dishes: [req.params.dishId]
             })
@@ -119,11 +119,12 @@ favRouter.route('/:dishId')
     });
 })
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+
     res.statusCode = 403;
     res.end('PUT operation not supported on /favorites/' + req.params.dishId); 
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favourites.findOne({user: req.user._id}, (err, fav) => {
+    Favorites.findOne({user: req.user._id}, (err, fav) => {
         if(err) {
             next(err);
         }
@@ -138,7 +139,7 @@ favRouter.route('/:dishId')
             .catch( (err) => next(err));
         }
         else {
-            const error = new Error('Your favourites list is empty');
+            const error = new Error('Favourites List is empty!');
             error.status = 400;
             next(error);
         }

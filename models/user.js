@@ -11,12 +11,11 @@ var User = new Schema({
         type: String,
         default: ''
     }, 
-    favorites: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref : 'dish',
-        required:false,
-       
-    },
+    // favorites: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref : 'dish',
+    //     required:false,
+    // },
     facebookId:  String,
     admin:   {
         type: Boolean,
